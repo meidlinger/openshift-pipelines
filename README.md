@@ -1,6 +1,10 @@
 # openshift-pipelines
 
-## Setup
+## Deploy Openshift Pipelines (Tekton) Operator
+
+Deploy the OpenShift Pipelines operator to all namespaces in the cluster and deploy the `tkn` command line tool to your local machine or bastion host.
+
+## Setup Application Environments
 
 Setup steps for "employee" example application.
 
@@ -50,3 +54,36 @@ export TEST_URL="http://`oc get route springboot-demo -n $TEST_PROJECT -o jsonpa
 export PRODUCTION_URL="http://`oc get route springboot-demo -n $PRODUCTION_PROJECT -o jsonpath --template="{.spec.host}"`/v1/api/sdg/demo/person/checktitle?name=Kenny"
 echo -e "\nTEST:        $TEST_URL\nPRODUCTION:  $PRODUCTION_URL\n"
 ```
+
+## Deploy/Test Building Blocks Needed for the Pipeline
+
+Pipeline Resources:
+* Image
+* Git Repository
+
+Tasks:
+* Build Container
+* Tag Container
+* Test Container
+* Deploy Container
+
+### Pipeline Resources
+
+Apply the image and repository resources to the employee application build project.
+
+```
+cat pipelineresources/employee_resources.yaml | envsubst | oc create -f - -n $BUILD_PROJECT
+```
+
+### Build Container
+
+### Tag Container
+
+### Test Container
+
+### Deploy Container
+
+
+## Deploy Pipeline
+
+
