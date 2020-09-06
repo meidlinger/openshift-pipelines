@@ -75,13 +75,13 @@ Apply the image and repository resources to the employee application build proje
 cat pipelineresources/employee_resources.yaml | envsubst | oc create -f - -n $BUILD_PROJECT
 ```
 
-### Build Container
+### Build Container Task
 
-### Tag Container
+### Tag Container Task
 
-### Test Container
+### Test Container Task
 
-### Deploy Container
+### Deploy Container Task
 
 
 ## Deploy Pipeline
