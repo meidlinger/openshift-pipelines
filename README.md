@@ -39,5 +39,14 @@ TODO:  automate the following:
 oc new-app registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift~https://github.com/meidlinger/sdgdemoboot --name=springboot-demo -n $BUILD_PROJECT
 oc new-app registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift~https://github.com/meidlinger/sdgdemoboot --name=springboot-demo -n $TEST_PROJECT
 oc new-app registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift~https://github.com/meidlinger/sdgdemoboot --name=springboot-demo -n $PRODUCTION_PROJECT
+oc expose svc springboot-demo -n $TEST_PROJECT
+oc expose svc springboot-demo -n $PRODUCTION_PROJECT
 ```
 
+### Test deployment
+
+```
+export TEST_URL="http://`oc get route springboot-demo -n $TEST_PROJECT -o jsonpath --template="{.spec.host}"`/v1/api/sdg/demo/person/checktitle?name=Kenny"
+export PRODUCTION_URL="http://`oc get route springboot-demo -n $PRODUCTION_PROJECT -o jsonpath --template="{.spec.host}"`/v1/api/sdg/demo/person/checktitle?name=Kenny"
+echo -e "\nTEST:        $TEST_URL\nPRODUCTION:  $PRODUCTION_URL\n"
+```
