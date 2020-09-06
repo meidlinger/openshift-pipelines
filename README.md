@@ -10,9 +10,9 @@ Setup steps for "employee" example application.
 export BUILD_PROJECT=employee-build
 export TEST_PROJECT=employee-test
 export PRODUCTION_PROJECT=employee
-oc adm new-project $BUILD_PROJECT
-oc adm new-project $TEST_PROJECT
-oc adm new-project $PRODUCTION_PROJECT
+oc new-project $BUILD_PROJECT
+oc new-project $TEST_PROJECT
+oc new-project $PRODUCTION_PROJECT
 ```
 
 ### Deploy data services into test and production environments
