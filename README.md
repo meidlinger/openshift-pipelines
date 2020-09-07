@@ -77,6 +77,10 @@ cat pipelineresources/employee_resources.yaml | envsubst | oc create -f - -n $BU
 
 ### Build Container Task
 
+```
+tkn clustertask start s2i-java-11 --inputresource source=app-repo --outputresource image=app-image --showlog --param TLSVERIFY=false  -n employee-build --dry-run
+```
+
 ### Tag Container Task
 
 ### Test Container Task
