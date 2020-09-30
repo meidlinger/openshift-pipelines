@@ -47,6 +47,18 @@ oc expose svc springboot-demo -n $TEST_PROJECT
 oc expose svc springboot-demo -n $PRODUCTION_PROJECT
 ```
 
+### Redefine ImageStreams
+
+```
+oc delete is springboot-demo -n $TEST_PROJECT
+oc delete is springboot-demo -n $PRODUCTION_PROJECT
+oc tag image-registry.openshift-image-registry.svc:5000/employee-build/springboot-demo image-registry.openshift-image-registry.svc:5000/employee-build/springboot-demo:latest
+oc policy add-role-to-group system:image-puller system:serviceaccounts:${TEST_PROJECT} -n $BUILD_PROJECT
+oc policy add-role-to-group system:image-puller system:serviceaccounts:${PRODUCTION_PROJECT} -n $TEST_PROJECT
+oc import-image image-registry.openshift-image-registry.svc:5000/${BUILD_PROJECT}/springboot-demo:latest --confirm -n $TEST_PROJECT
+oc import-image image-registry.openshift-image-registry.svc:5000/${TEST_PROJECT}/springboot-demo:latest --confirm -n $PRODUCTION_PROJECT
+```
+
 ### Test deployment
 
 ```
@@ -63,9 +75,9 @@ Pipeline Resources:
 
 Tasks:
 * Build Container
-* Tag Container
+* Promote Container to Test
 * Test Container
-* Deploy Container
+* Promote Container to Production
 
 ### Pipeline Resources
 
@@ -78,15 +90,27 @@ cat pipelineresources/employee_resources.yaml | envsubst | oc create -f - -n $BU
 ### Build Container Task
 
 ```
-tkn clustertask start s2i-java-11 --inputresource source=app-repo --outputresource image=app-image --showlog --param TLSVERIFY=false  -n employee-build --dry-run
+tkn clustertask start s2i-java-11 --inputresource source=app-repo --outputresource image=app-image --showlog --param TLSVERIFY=false  -n $BUILD_PROJECT --dry-run
 ```
 
-### Tag Container Task
+### Promote Container to Test Task
+
+```
+tkn clustertask start openshift-client --showlog --param SCRIPT="oc import-image image-registry.openshift-image-registry.svc:5000/${BUILD_PROJECT}/springboot-demo:latest" -n $TEST_PROJECT
+```
 
 ### Test Container Task
 
-### Deploy Container Task
+```
+tkn clustertask start openshift-client --showlog --param SCRIPT="[ \"`curl -s http://springboot-demo-${TEST_PROJECT}.apps.cluster-17d8.sandbox171.opentlc.com/v1/api/sdg/demo/person/checktitle?name=KENNY`\" = \"CONSULTANT\" ] || exit 1" -n $TEST_PROJECT
+```
 
+
+### Promote Container to Production Task
+
+```
+tkn clustertask start openshift-client --showlog --param SCRIPT="oc import-image image-registry.openshift-image-registry.svc:5000/${TEST_PROJECT}/springboot-demo:latest" -n $PRODUCTION_PROJECT
+```
 
 ## Deploy Pipeline
 
