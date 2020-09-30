@@ -115,3 +115,19 @@ tkn clustertask start openshift-client --showlog --param SCRIPT="oc import-image
 ## Deploy Pipeline
 
 
+### Create Pipeline Object
+
+```
+cat pipeline/build-and-promote.yaml | envsubst | oc create -f - -n $BUILD_PROJECT
+```
+
+### Run Pipeline
+
+```
+$ tkn pipeline start build-and-promote \
+    -r git-repo=app-repo \
+    -r image=app-image \
+    -p BUILD_PROJECT=${BUILD_PROJECT} \
+    -p TEST_PROJECT=${TEST_PROJECT} \
+    -p PRODUCTION_PROJECT=${PRODUCTION_PROJECT} 
+```

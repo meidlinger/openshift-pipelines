@@ -36,6 +36,7 @@ spec:
   - name: promote-to-test
     taskRef:
       name: openshift-client
+      kind: ClusterTask
     params:
     - name: SCRIPT
       value: "oc import-image image-registry.openshift-image-registry.svc:5000/${BUILD_PROJECT}/springboot-demo:latest -n $TEST_PROJECT"
@@ -44,6 +45,7 @@ spec:
   - name: test-image
     taskRef:
       name: openshift-client
+      kind: ClusterTask
     params:
     - name: SCRIPT
       value: "oc import-image image-registry.openshift-image-registry.svc:5000/${BUILD_PROJECT}/springboot-demo:latest -n $TEST_PROJECT"
@@ -52,12 +54,9 @@ spec:
   - name: promote-to-prod
     taskRef:
       name: openshift-client
+      kind: ClusterTask
     params:
     - name: SCRIPT
       value: "oc import-image image-registry.openshift-image-registry.svc:5000/${TEST_PROJECT}/springboot-demo:latest -n $PRODUCTION_PROJECT"
     runAfter:
     - test-image
-
-
-
-
