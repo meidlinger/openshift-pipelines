@@ -48,7 +48,7 @@ spec:
       kind: ClusterTask
     params:
     - name: SCRIPT
-      value: "oc import-image image-registry.openshift-image-registry.svc:5000/${BUILD_PROJECT}/springboot-demo:latest -n $TEST_PROJECT"
+      value: "[ \"`curl -s http://springboot-demo-${TEST_PROJECT}.apps.cluster-17d8.sandbox171.opentlc.com/v1/api/sdg/demo/person/checktitle?name=KENNY`\" = \"CONSULTANT\" ] || exit 1"
     runAfter:
     - promote-to-test
   - name: promote-to-prod
