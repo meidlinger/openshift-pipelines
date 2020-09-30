@@ -1,0 +1,63 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: build-and-promote
+spec:
+  resources:
+  - name: git-repo
+    type: git
+  - name: image
+    type: image
+  params:
+  - name: BUILD_PROJECT
+    type: string
+    description:  Build project for application
+  - name: TEST_PROJECT
+    type: string
+    description:  Test project for application
+  - name: PRODUCTION_PROJECT
+    type: string
+    description:  Production project for application
+  tasks:
+  - name: build-image
+    taskRef:
+      name: s2i-java-11
+      kind: ClusterTask
+    resources:
+      inputs:
+      - name: source
+        resource: git-repo
+      outputs:
+      - name: image
+        resource: image
+    params:
+    - name: TLSVERIFY
+      value: "false"
+  - name: promote-to-test
+    taskRef:
+      name: openshift-client
+    params:
+    - name: SCRIPT
+      value: "oc import-image image-registry.openshift-image-registry.svc:5000/${BUILD_PROJECT}/springboot-demo:latest -n $TEST_PROJECT"
+    runAfter:
+    - build-image
+  - name: test-image
+    taskRef:
+      name: openshift-client
+    params:
+    - name: SCRIPT
+      value: "oc import-image image-registry.openshift-image-registry.svc:5000/${BUILD_PROJECT}/springboot-demo:latest -n $TEST_PROJECT"
+    runAfter:
+    - promote-to-test
+  - name: promote-to-prod
+    taskRef:
+      name: openshift-client
+    params:
+    - name: SCRIPT
+      value: "oc import-image image-registry.openshift-image-registry.svc:5000/${TEST_PROJECT}/springboot-demo:latest -n $PRODUCTION_PROJECT"
+    runAfter:
+    - test-image
+
+
+
+
